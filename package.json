@@ -1,0 +1,96 @@
+{
+  "name": "printcaddy-desktop",
+  "version": "1.0.0",
+  "description": "PrintCaddy - easy 3D CAD for 3D printing, Windows desktop app",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "fetch-web": "node scripts/fetch-web.js",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "release": "electron-builder --win nsis --x64 --publish always"
+  },
+  "keywords": [],
+  "author": "rrkennedy69",
+  "license": "AGPL-3.0-only",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  },
+  "productName": "PrintCaddy",
+  "homepage": "https://rrkennedy69.github.io/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rrkennedy69/printcaddy-desktop.git"
+  },
+  "build": {
+    "appId": "io.github.rrkennedy69.printcaddy",
+    "productName": "PrintCaddy",
+    "copyright": "AGPL-3.0 - based on layerling",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "LICENSE",
+      "NOTICE.md"
+    ],
+    "extraResources": [
+      {
+        "from": "web",
+        "to": "web"
+      },
+      {
+        "from": "LICENSE",
+        "to": "LICENSE.txt"
+      },
+      {
+        "from": "NOTICE.md",
+        "to": "NOTICE.md"
+      }
+    ],
+    "asar": true,
+    "fileAssociations": [
+      {
+        "ext": "lyl",
+        "name": "PrintCaddy design",
+        "description": "PrintCaddy design",
+        "role": "Editor"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "PrintCaddy-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "differentialPackage": true,
+      "license": "LICENSE",
+      "createDesktopShortcut": true,
+      "shortcutName": "PrintCaddy"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "rrkennedy69",
+        "repo": "printcaddy-desktop",
+        "releaseType": "release"
+      }
+    ]
+  }
+}

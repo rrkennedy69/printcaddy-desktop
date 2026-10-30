@@ -1,0 +1,44 @@
+name: Build and release (Windows)
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run fetch-web
+      - name: Google OAuth desktop client (optional secret)
+        shell: bash
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_DESKTOP_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_DESKTOP_CLIENT_SECRET }}
+        run: |
+          if [ -n "$GOOGLE_CLIENT_ID" ]; then
+            printf '{"client_id":"%s","client_secret":"%s"}\n' "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" > src/oauth-client.json
+            echo "Google desktop client configured"
+          else
+            echo "No GOOGLE_DESKTOP_CLIENT_ID secret - Drive sign-in will show 'not set up'"
+          fi
+      - name: Build installer and publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win nsis --x64 --publish always
+      - name: Build only (manual run)
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        run: npx electron-builder --win nsis --x64 --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer
+          path: |
+            release/*.exe
+            release/*.blockmap
+            release/latest.yml
