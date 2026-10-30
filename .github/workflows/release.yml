@@ -27,14 +27,17 @@ jobs:
           else
             echo "No GOOGLE_DESKTOP_CLIENT_ID secret - Drive sign-in will show 'not set up'"
           fi
-      - name: Build installer and publish release
+      - name: Build installer
+        run: npx electron-builder --win nsis --x64 --publish never
+      - name: Publish GitHub Release (installer, latest.yml, blockmap)
         if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win nsis --x64 --publish always
-      - name: Build only (manual run)
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        run: npx electron-builder --win nsis --x64 --publish never
+        run: |
+          V="${GITHUB_REF_NAME}"
+          gh release view "$V" >/dev/null 2>&1 || gh release create "$V" --title "PrintCaddy ${V#v}" --notes "PrintCaddy for Windows ${V#v}. Download PrintCaddy-Setup-${V#v}.exe below. Unsigned installer: if SmartScreen appears, click More info -> Run anyway."
+          gh release upload "$V" release/PrintCaddy-Setup-*.exe release/PrintCaddy-Setup-*.exe.blockmap release/latest.yml --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: installer
