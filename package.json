@@ -1,6 +1,6 @@
 {
   "name": "printcaddy-desktop",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "PrintCaddy - easy 3D CAD for 3D printing, Windows desktop app",
   "main": "src/main.js",
   "scripts": {
